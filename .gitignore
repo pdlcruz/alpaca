@@ -1,3 +1,6 @@
 model/
 .env
 ezlegal/.env
+
+node_modules/
+alpaca_saved_model/
