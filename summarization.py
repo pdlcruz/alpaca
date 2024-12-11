@@ -4,16 +4,15 @@ import torch
 import argparse
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# Constants
+
 MODEL_ID = "meta-llama/Llama-3.1-8B-Instruct"
 
-# Load tokenizer and model with GPU support
 print("Loading model and tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
-    torch_dtype=torch.bfloat16,  # Optimized for GPUs with mixed precision
-    device_map="auto",          # Automatically assigns to GPU(s)
+    torch_dtype=torch.bfloat16, 
+    device_map="auto",         
 )
 
 # Function to summarize text
@@ -33,14 +32,13 @@ def summarize_text(input_text, max_new_tokens=150):
     outputs = model.generate(
         **tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024).to("cuda"),
         max_new_tokens=max_new_tokens,
-        num_beams=4,  # Beam search for better results
+        num_beams=4,  
         early_stopping=True,
     )
     summary = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return summary
 
 
-# Batch processing for multiple documents
 def summarize_batch(input_texts, max_new_tokens=150):
     """
     Summarize multiple input texts.

@@ -6,7 +6,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
-app.use(express.json());  // Ensure JSON parsing middleware is used
+app.use(express.json());  
 require('dotenv').config();
 
 console.log(process.env.HUGGINGFACE_API_KEY);
@@ -14,15 +14,14 @@ const client = new HfInference(process.env.HUGGINGFACE_API_KEY,);
 
 app.post('/query', async (req, res) => {
     try {
-        // Directly use the input string from the nested object structure
         const inputs = req.body.content;
-        console.log(inputs); // This should log the string sent from the client
+        console.log(inputs);
         const chatCompletion = await client.chatCompletion({
             model: "meta-llama/Llama-3.1-8B-Instruct",
             messages: [
                 {
                     role: "user",
-                    content: inputs  // Directly use the string
+                    content: inputs  
                 }
             ],
             max_tokens: 500

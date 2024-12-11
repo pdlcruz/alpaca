@@ -20,7 +20,7 @@ app.post('/ocr', async (req, res) => {
     const buffer = Buffer.from(arrayBuffer);
 
     const worker = await createWorker('eng', 1, {
-        logger: m => console.log(m), // Add logger here
+        logger: m => console.log(m), 
       });
     await worker.load();
     await worker.loadLanguage('eng');

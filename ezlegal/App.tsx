@@ -25,7 +25,7 @@ export default function App() {
   const [preQuestionSelected, setPreQuestionSelected] = useState<boolean>(false);
 
   
-    // Your web app's Firebase configuration
+
   const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -35,52 +35,46 @@ export default function App() {
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
   };
-  // console.log(process.env.REACT_APP_FIREBASE_API_KEY);
 
-  // Initialize Firebase
+
+
   const app = initializeApp(firebaseConfig);
 
   const storage = getStorage(app);
-  // Function to handle image picking
 
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      // aspect: [8, 3],
       quality: 1,
     });
   
     if (!result.canceled) {
-      console.log("Image picked:", result.assets[0].uri, ); // Changed to log the URI directly
+      console.log("Image picked:", result.assets[0].uri, ); 
       setImage(result.assets[0].uri);
       try {
         // const url = "https://firebasestorage.googleapis.com/v0/b/youbet-48cf2.firebasestorage.app/o/images%2F1733296174325_image.jpg?alt=media&token=b127ec5d-30ba-4f3b-a69b-dea05e06fba4";
         const url = await uploadImage(result.assets[0].uri); // Ensuring this is awaited
         console.log("Uploaded Image URL:", url);
-        sendImageUrlToServer(url); // This can be awaited or handled separately depending on your flow
+        sendImageUrlToServer(url); 
       } catch (error) {
         console.error("Error uploading image:", error);
       }
     }
   };
   
-// Function to upload an image file to Firebase Storage
 async function uploadImage(fileUri:string) {
-  const filename = `${Date.now()}_image.jpg`; // Ensure unique filename; adjust as necessary
+  const filename = `${Date.now()}_image.jpg`; 
   const storageRef = ref(storage, `images/${filename}`);
 
   try {
-      // Fetch the file from local file system
+     
       const response = await fetch(fileUri);
-      const blob = await response.blob(); // Convert to a blob
-
-      // Upload file to Firebase Storage
+      const blob = await response.blob(); 
       const snapshot = await uploadBytes(storageRef, blob);
       console.log('Uploaded a blob or file!');
 
-      // Get downloadable URL
       const downloadURL = await getDownloadURL(snapshot.ref);
       console.log('File available at', downloadURL);
       return downloadURL;
@@ -116,7 +110,6 @@ async function uploadImage(fileUri:string) {
     console.log('Querying:', JSON.stringify({
       content: question_sent
   }));
-  //reset ezlegal responses
   setEzlegalPossibleQuestions([]);
   const already_generated_questions = userQuestions.concat(ezlegalPossibleQuestions);
   let newQuestions: string[]= [];
@@ -140,7 +133,6 @@ async function uploadImage(fileUri:string) {
           const data = await response.json();
           const newQuestion = data.message.content;
 
-          // Check if the new question is not already in the combined list of user and possible questions, or newly generated ones
           if (!already_generated_questions.includes(newQuestion) && !newQuestions.includes(newQuestion)) {
               newQuestions.push(newQuestion);
           } else {
@@ -167,7 +159,6 @@ async function uploadImage(fileUri:string) {
       const newResponse = { question: userQuestion, answer: result.message.content as string };
       setResponses(previousResponses => [...previousResponses, newResponse]);
       setUserQuestion('');
-      //only if model responds do we add question of user
       setUserQuestions([...userQuestions, userQuestion]);
       console.log(result.message.content);
       setEzlegalResponses([...ezlegalResponses, result.message.content as string]);
@@ -192,17 +183,6 @@ const renderItem = ({ item }:{item:Item}) => (
     <Text style={styles.answer}>Respuesta: {item.answer}</Text>
   </View>
 );
-
-  // return (
-  //   <View style={styles.container}>
-  //     <Button title="Pick an Image" onPress={pickImage} />
-  //     {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-  //     <TextInput style={{ height: 40, width: 80, borderColor: 'gray', borderWidth: 1 }} onChangeText={setUserQuestion} value={userQuestion} />
-  //     <Button title="Ask question" onPress={() => query({ inputs: userQuestion })} />
-  //     <Text style={{ margin: 10 }}>ezlegal response:{response}</Text>
-  //     <StatusBar style="auto" />
-  //   </View>
-  // );
 
   useEffect(() => {
     if (userQuestion && preQuestionSelected) {
